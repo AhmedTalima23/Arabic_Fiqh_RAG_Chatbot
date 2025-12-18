@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  chatbot:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./embeddings:/app/embeddings
+      - ./models:/app/models
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+    command: python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+
+  # Optional: Chroma database
+  chroma:
+    image: ghcr.io/chroma-core/chroma:0.4.24
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./embeddings/chroma_db:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=False
