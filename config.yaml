@@ -1,0 +1,92 @@
+# Arabic Fiqh RAG Chatbot Configuration
+
+# Data Processing
+data:
+  raw_books_dir: "data/raw_books"
+  cleaned_books_dir: "data/cleaned_books"
+  chunks_dir: "data/chunks"
+  metadata_file: "data/metadata.json"
+  chunk_size: 512  # Characters per chunk
+  overlap: 50      # Overlap between chunks
+
+# Embeddings Configuration
+embeddings:
+  model_name: "sentence-transformers/AraBERT-base-v2"
+  # Alternative models: "sentence-transformers/multilingual-e5-base", "aubmindlab/bert-base-arabertv2"
+  embedding_dim: 768
+  index_type: "faiss"  # Options: "faiss", "chroma"
+  index_path: "embeddings/embeddings_index.faiss"
+  chroma_db_path: "embeddings/chroma_db"
+  device: "cuda"  # Options: "cuda", "cpu"
+
+# Language Model Configuration
+model:
+  llm_type: "local"  # Options: "local", "huggingface", "openai"
+  
+  # For local models
+  local_model_name: "aubmindlab/Noor-7B-instruct"  # Arabic LLM options: "aubmindlab/Jais-13b", "aubmindlab/Noor-7B-instruct"
+  model_path: "models/arabic_llm"
+  tokenizer_path: "models/tokenizer"
+  
+  # For HuggingFace API
+  huggingface_model: "aubmindlab/Noor-7B-instruct"
+  huggingface_token: "${HUGGINGFACE_TOKEN}"  # Set via environment variable
+  
+  # For OpenAI API
+  openai_model: "gpt-4-turbo"
+  openai_api_key: "${OPENAI_API_KEY}"  # Set via environment variable
+  
+  # Model parameters
+  max_length: 512
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 50
+  device: "cuda"  # Options: "cuda", "cpu"
+
+# Retrieval Configuration
+retrieval:
+  top_k: 3  # Number of top results to retrieve
+  score_threshold: 0.5  # Minimum relevance score
+  search_type: "similarity"  # Options: "similarity", "mmr" (Maximum Marginal Relevance)
+  normalize_input: true  # Arabic text normalization
+
+# Generation Configuration
+generation:
+  max_output_length: 500
+  min_output_length: 50
+  include_citations: true
+  include_confidence: true
+  language: "ar"  # Response language: "ar" (Arabic), "en" (English), "both"
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  log_level: "info"
+  cors_origins: ["*"]  # CORS allowed origins
+  request_timeout: 30  # Seconds
+
+# Logging Configuration
+logging:
+  level: "INFO"  # Options: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+  file: "logs/app.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Pipeline Configuration
+pipeline:
+  use_query_expansion: true  # Expand queries for better retrieval
+  use_reranking: false       # Rerank results (requires extra model)
+  use_hyde: false            # Hypothetical Document Embeddings
+  max_context_length: 2000   # Max characters to use as context
+
+# Metadata Fields
+metadata_fields:
+  - book
+  - chapter
+  - section
+  - verse
+  - madhhab  # Islamic school: Hanafi, Maliki, Shafi'i, Hanbali, Jafari
+  - author
+  - period   # Classical, Medieval, Modern
+  - source_type  # Original text, commentary, fatwa
